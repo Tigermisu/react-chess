@@ -1,0 +1,23 @@
+.square {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 10vmin;
+    height: 10vmin;
+}
+
+.square.white {
+    background-color: #eee;
+}
+
+.square.black {
+    background-color: #333;
+}
+
+.square.white.highlighted {
+    background-color: #ada;
+}
+
+.square.black.highlighted {
+    background-color: #696;
+}

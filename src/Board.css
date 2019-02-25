@@ -1,0 +1,19 @@
+.game-area {
+    border: #bcbcbc solid 10px;
+}
+
+.row, .col-coords {
+    position: relative;
+    display: flex;
+}
+
+.row-coord {
+    position: absolute;
+    left: calc(-4vmin - 10px);
+    top: 50%;
+    transform: translate(0, -50%);
+}
+
+.col-coords {
+    justify-content: space-around;
+}
