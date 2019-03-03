@@ -6,10 +6,7 @@ import "./Board.css";
 
 class Board extends Component {
     colors = ["white", "black"];
-    colCoordinatesChars = ["a", "b", "c", "d", "e", "f", "g", "h"];
-    defaultPieceOrdering = ["R", "N", "B", "Q", "K", "B", "N", "R"];
-    selectedPiece = null;
-    
+    selectedPiece = null;    
 
     constructor(props) {
         super(props);
@@ -23,7 +20,7 @@ class Board extends Component {
     }
 
     get colCoordinates() {
-        return this.colCoordinatesChars.map((coord, index) => <div key={index}>{ coord.toUpperCase() }</div>);
+        return Rulebook.colCoordinatesChars.map((coord, index) => <div key={index}>{ coord.toUpperCase() }</div>);
     }
 
     get board() {
@@ -68,23 +65,15 @@ class Board extends Component {
 
     canMovePiece(fromRow, fromCol, toRow, toCol) {
         const piece = this.getPieceAtPos(fromRow, fromCol);
-        if((fromRow === toRow && fromCol === toCol)
-            || (piece.props.notation !== 'N' && this.isMovementObstructed(fromRow, fromCol, toRow, toCol))) {
+        if(!piece || (fromRow === toRow && fromCol === toCol)) {
             return false;
         }
 
-        const from = this.convertToChessCords(fromRow, fromCol),
-            to = this.convertToChessCords(toRow, toCol);
+        const simplifiedPositions = this.state.piecePositions.map(row => row.map(pieceData => {
+            return pieceData ? {notation: pieceData.piece.props.notation, dirty: pieceData.dirty} : false;
+        }));
 
-        return Rulebook.isValidMove(piece.props.notation, piece.props.team, from, to);
-    }
-
-    isMovementObstructed(fromRow, fromCol, toRow, toCol) {
-        console.log(`Verifying obstructions from ${fromRow},${fromCol} to ${toRow},${toCol}`);
-
-        // TODO: Verify obstructions
-
-        return false;      
+        return Rulebook.isValidMove(piece.props.notation, piece.props.team, fromRow, fromCol, toRow, toCol, simplifiedPositions);
     }
 
     moveSelectedPieceTo(row, col) {
@@ -103,10 +92,12 @@ class Board extends Component {
             };
 
             newState.piecePositions[toRow][toCol] = state.piecePositions[fromRow][fromCol];
+            newState.piecePositions[toRow][toCol].dirty = true;
             newState.piecePositions[fromRow][fromCol] = undefined;
 
             if(attackedPiece) {
                 console.log('adding attacked piece to list of dead pieces');
+                console.log(attackedPiece);
                 newState.deadPieces = [...state.deadPieces, attackedPiece];
             }
 
@@ -150,31 +141,27 @@ class Board extends Component {
         const pawnRow = ["P","P","P","P","P","P","P","P"];
 
         return [ 
-            this.defaultPieceOrdering.map((n, i) => <Piece team='black' notation={n} key={i} />),
-            pawnRow.map((n, i) => <Piece team='black' notation={n} key={i} />),
+            Rulebook.defaultPieceOrdering.map((n, i) => ({dirty: false, piece: <Piece team='black' notation={n} key={i} />})),
+            pawnRow.map((n, i) => ({dirty: false, piece: <Piece team='black' notation={n} key={i} />})),
             [],
             [],
             [],
             [],
-            pawnRow.map((n, i) => <Piece team='white' notation={n} key={i} />),
-            this.defaultPieceOrdering.map((n, i) => <Piece team='white' notation={n} key={i} />)
+            pawnRow.map((n, i) => ({dirty: false, piece: <Piece team='white' notation={n} key={i} />})),
+            Rulebook.defaultPieceOrdering.map((n, i) => ({dirty:false, piece: <Piece team='white' notation={n} key={i} />}))
         ]    
     } 
 
     getPieceAtPos(row, col) {
         if(typeof this.state === 'undefined') return null;
  
-        const piece = this.state.piecePositions[row][col];
+        const pieceData = this.state.piecePositions[row][col];
 
-        if(typeof piece === 'undefined') {
-            return null;
+        if(pieceData) {
+            return pieceData.piece;
         }
 
-        return piece;
-    }
-
-    convertToChessCords(row, col) {
-        return `${this.colCoordinatesChars[col]}${8-row}`;
+        return null;
     }
 
     render() {
@@ -184,7 +171,7 @@ class Board extends Component {
                     { this.renderGameArea() }
                 </div>
                 <div className="col-coords">
-                    { this.colCoordinates }
+                    { Rulebook.colCoordinates }
                 </div>
                 <div className="meta">
                     { `${this.state.isWhiteNext ? 'White':'Black'} to move`}
