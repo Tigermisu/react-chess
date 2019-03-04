@@ -55,7 +55,6 @@ class Board extends Component {
     }
 
     canSelect(piece) {
-        console.log('checking if piece can be selected');
         return !(this.state.isWhiteNext ^ piece.props.team === 'white');
     }
 
@@ -83,7 +82,6 @@ class Board extends Component {
         
 
     movePiece(fromRow, fromCol, toRow, toCol) {
-        console.log(`moving piece from ${fromRow},${fromCol} to ${toRow},${toCol}`);
         this.setState((state) => {
             const attackedPiece = state.piecePositions[toRow][toCol];
             let newState = {
@@ -96,8 +94,6 @@ class Board extends Component {
             newState.piecePositions[fromRow][fromCol] = undefined;
 
             if(attackedPiece) {
-                console.log('adding attacked piece to list of dead pieces');
-                console.log(attackedPiece);
                 newState.deadPieces = [...state.deadPieces, attackedPiece];
             }
 
@@ -107,7 +103,6 @@ class Board extends Component {
 
     unSelectPiece() {
         if(this.selectedPiece !== null) {
-            console.log('unselecting piece');
             this.selectedPiece = null;
             this.setState({
                 selectedPiecePos: [-1, -1]
@@ -118,7 +113,6 @@ class Board extends Component {
     selectPieceAt(row, col) {
         const clickedPiece = this.getPieceAtPos(row, col);
         if(clickedPiece) {
-            console.log('selecing piece');
             this.selectedPiece = clickedPiece;
             this.setState({
                 selectedPiecePos: [row, col]
