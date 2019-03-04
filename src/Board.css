@@ -2,6 +2,10 @@
     border: #bcbcbc solid 10px;
 }
 
+.game-area * {
+    user-select: none;
+}
+
 .row, .col-coords {
     position: relative;
     display: flex;

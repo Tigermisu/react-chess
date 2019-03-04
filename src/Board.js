@@ -36,16 +36,19 @@ class Board extends Component {
         for(let i = 0; i < 8; i++) {
             board[i] = [];
             for(let j = 0; j < 8; j++) {
+                const pieceAtPos = this.getPieceAtPos(i, j);
                 const squareColor = this.colors[((j & 1) + (i & 1)) & 1];
                 const isHighlighted = i === this.state.selectedPiecePos[0] && j === this.state.selectedPiecePos[1];
                 const isAttacked = Rulebook.isAttacked(i, j, this.state.isWhiteNext ? 'black':'white', this.simplifiedPositions);
+                const canMoveTo = this.selectedPiece && this.canMoveSelectedPieceTo(i, j) && (!pieceAtPos || (pieceAtPos.props.team !== this.selectedPiece.props.team));
                 board[i][j] = <Square 
                     key={i * 8 + j}
                     highlighted={isHighlighted} 
                     attacked={isAttacked}
+                    visitable={canMoveTo}
                     color={squareColor} 
                     onClick={() => this.handleClick(i, j)}
-                    piece={this.getPieceAtPos(i, j)} />
+                    piece={pieceAtPos} />
             }
         }
 

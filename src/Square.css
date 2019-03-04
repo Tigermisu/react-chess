@@ -29,3 +29,15 @@
 .square.black.highlighted {
     background-color: #696;
 }
+
+.square.visitable:hover {
+    cursor: pointer;
+}
+
+.square.white.visitable {
+    background-color: #aad;
+}
+
+.square.black.visitable {
+    background-color: #336;
+}

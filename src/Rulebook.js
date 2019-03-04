@@ -13,7 +13,7 @@ class Rulebook {
             case "N": return Rulebook.validateKnightMovement(fromRow, fromCol, toRow, toCol);
             case "B": return Rulebook.validateBishopMovement(fromRow, fromCol, toRow, toCol);
             case "Q": return Rulebook.validateQueenMovement(fromRow, fromCol, toRow, toCol);
-            case "K": return Rulebook.validateKingMovement(fromRow, fromCol, toRow, toCol);
+            case "K": return Rulebook.validateKingMovement(color, fromRow, fromCol, toRow, toCol, piecePositions);
             default:
                 throw new Error(`Unknown piece for movement validation: ${piece}`);
         }
@@ -112,11 +112,11 @@ class Rulebook {
         return fromRow === toRow || fromCol === toCol || Math.abs(toCol - fromCol) === Math.abs(toRow - fromRow);
     }
 
-    static validateKingMovement(fromRow, fromCol, toRow, toCol) {
+    static validateKingMovement(color, fromRow, fromCol, toRow, toCol, piecePositions) {
         const deltaRow = Math.abs(toRow - fromRow),
             deltaCol = Math.abs(toCol - fromCol);
 
-        return deltaRow < 2 && deltaCol < 2;
+        return deltaRow < 2 && deltaCol < 2 && !Rulebook.isAttacked(toRow, toCol, color === 'white'? 'black':'white', piecePositions);
     }
 
 }
