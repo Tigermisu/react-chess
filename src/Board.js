@@ -23,6 +23,13 @@ class Board extends Component {
         return Rulebook.colCoordinatesChars.map((coord, index) => <div key={index}>{ coord.toUpperCase() }</div>);
     }
 
+    get simplifiedPositions() {
+        return this.state.piecePositions.map(row => row.map(pieceData => {
+            return pieceData ? 
+                {notation: pieceData.piece.props.notation, dirty: pieceData.dirty, team: pieceData.piece.props.team} : false;
+        }));
+    }
+
     get board() {
         let board = [];
 
@@ -31,9 +38,11 @@ class Board extends Component {
             for(let j = 0; j < 8; j++) {
                 const squareColor = this.colors[((j & 1) + (i & 1)) & 1];
                 const isHighlighted = i === this.state.selectedPiecePos[0] && j === this.state.selectedPiecePos[1];
+                const isAttacked = Rulebook.isAttacked(i, j, this.state.isWhiteNext ? 'black':'white', this.simplifiedPositions);
                 board[i][j] = <Square 
                     key={i * 8 + j}
                     highlighted={isHighlighted} 
+                    attacked={isAttacked}
                     color={squareColor} 
                     onClick={() => this.handleClick(i, j)}
                     piece={this.getPieceAtPos(i, j)} />
@@ -68,9 +77,7 @@ class Board extends Component {
             return false;
         }
 
-        const simplifiedPositions = this.state.piecePositions.map(row => row.map(pieceData => {
-            return pieceData ? {notation: pieceData.piece.props.notation, dirty: pieceData.dirty} : false;
-        }));
+        const simplifiedPositions = this.simplifiedPositions;
 
         return Rulebook.isValidMove(piece.props.notation, piece.props.team, fromRow, fromCol, toRow, toCol, simplifiedPositions);
     }

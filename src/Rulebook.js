@@ -42,6 +42,24 @@ class Rulebook {
         return `${Rulebook.colCoordinatesChars[col]}${8-row}`;
     }
 
+    static isAttacked(targetRow, targetCol, attackerTeam, piecePositions) {
+        return piecePositions.some((row, rowIndex) => row.some((piece, colIndex) => {
+            if(piece && piece.team === attackerTeam) {                
+                if(piece.notation === 'P') {
+                    if(colIndex === targetCol) {
+                        return false;
+                    }
+
+                    return Math.abs(targetCol - colIndex) === 1 && (targetRow - rowIndex === (attackerTeam === 'black' ? 1 : -1));
+                }
+
+                return Rulebook.isValidMove(piece.notation, attackerTeam, rowIndex, colIndex, targetRow, targetCol, piecePositions);;                
+            }
+
+            return false;
+        }));
+    }
+
     static validatePawnMovement(color, fromRow, fromCol, toRow, toCol, piecePositions) {
         const deltaRow = toRow - fromRow,
             deltaColAbs = Math.abs(toCol - fromCol),
@@ -63,7 +81,12 @@ class Rulebook {
             return false;
         }
 
-        if(deltaRowAbs === 2 && ((color === "white" && fromRow !== 6) || (color === "black" && fromRow !== 1))) {
+        if(deltaRowAbs === 2 
+            && ((color === "white" && fromRow !== 6) || (color === "black" && fromRow !== 1))) {
+            return false;
+        }
+
+        if(deltaColAbs > 0 && deltaRowAbs > 1) {
             return false;
         }
 
